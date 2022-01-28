@@ -13,7 +13,7 @@ if (localStorage.getItem("history")) {
 
 function getApi() {
     var searchinput = document.getElementById("cityinput").value;
-    var api = "https://api.openweathermap.org/data/2.5/weather?q=" + searchinput + "&appid=e14c3208e3e6754ae41625a043fd64c7";
+    var api = "https://api.openweathermap.org/data/2.5/weather?q=" + searchinput + "&appid=e14c3208e3e6754ae41625a043fd64c7&units=imperial";
 
     fetch(api)
         .then(function (response) {
@@ -24,6 +24,20 @@ function getApi() {
             console.log(data);
             addHistory(data.name);
 
+            console.log(data.main.temp)
+            var weather = `<br><br>Temp: ${data.main.temp}
+            <br>
+            <br><br>
+            Wind: ${data.wind.speed}
+            <br>
+            <br><br>
+            Humidity: ${data.main.humidity}
+            <br>
+            <br><br>
+            UV Index:<div id="uv"></div>
+            <br>
+            <br>`;
+            document.getElementById("citydata").innerHTML = weather;
 
         });
 }
@@ -37,3 +51,4 @@ function addHistory(city) {
     localStorage.setItem("history", JSON.stringify(searchHistory));
 
 }
+

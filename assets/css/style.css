@@ -98,7 +98,7 @@ h3{
     padding: 0%;
 }
 #uv{
-    background-color: green;
+    
     color:white;
     padding: 5px 15px;
     border-radius: 3px ;
@@ -107,4 +107,13 @@ h3{
 img{
     width: 70px;
     margin-left: -15px;
+}
+#currentcity{
+    display: inline-block;
+    padding-right: 15px;
+    
+}
+.currentheader{
+    display: flex;
+    align-items: center;
 }

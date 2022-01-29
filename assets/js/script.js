@@ -1,4 +1,4 @@
-
+// get previous searches
 var searchButton = document.getElementById('button');
 var searchHistory = [];
 if (localStorage.getItem("history")) {
@@ -8,35 +8,29 @@ if (localStorage.getItem("history")) {
         el.classList.add("history");
         el.innerText = searchHistory[i];
         el.addEventListener("click", function (event) {
-
             showWeather(event.target.innerText);
         });
         document.getElementsByClassName("historycontainer")[0].appendChild(el);
     }
     showWeather(searchHistory[0]);
-
 }
+// display current weather (not uvi, uvi from onecall api)
 
 function showWeather(city) {
     var api = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=e14c3208e3e6754ae41625a043fd64c7&units=imperial";
-
     fetch(api)
         .then(function (response) {
             return response.json();
         })
         .then(function (data) {
-
-
+            // checks for duplicate searches
             if (searchHistory.includes(data.name)) {
-
-
                 addHistory(data.name, true);
             }
             else {
                 addHistory(data.name, false);
             }
-
-            var weather = `<br><br>Temp: ${data.main.temp}
+            var weather = `<br>Temp: ${data.main.temp}
             <br>
             <br><br>
             Wind: ${data.wind.speed}
@@ -58,6 +52,7 @@ function showWeather(city) {
             }).format(date));
             document.getElementById("currentcity").innerHTML = data.name + " (" + day + ")";
 
+            // displays 5 day forcast for api, icons and uvi
             var onecall = "https://api.openweathermap.org/data/2.5/onecall?lat=" + data.coord.lat + "&lon=" + data.coord.lon + "&appid=e14c3208e3e6754ae41625a043fd64c7&units=imperial";
 
             fetch(onecall)
@@ -66,11 +61,10 @@ function showWeather(city) {
                 })
                 .then(function (data) {
 
-                    console.log(data);
                     var daily = data.daily;
-                    for (var i = 0; i < 5; i++) {
+                    for (var i = 1; i < 6; i++) {
                         // forecast Date
-                        var forecastdate = new Date();
+                        var forecastdate = new Date(daily[i].dt * 1000);
                         var forecastday = (new Intl.DateTimeFormat('en-US', {
                             month: 'numeric',
                             day: '2-digit',
@@ -89,19 +83,31 @@ function showWeather(city) {
                         <br>
                         <br><br>`;
 
-                        document.getElementsByClassName("forecastcard")[i].innerHTML = forecast;
+                        document.getElementsByClassName("forecastcard")[i - 1].innerHTML = forecast;
 
                     }
+                    document.getElementById("currenticon").src = `http://openweathermap.org/img/wn/${daily[i].weather[0].icon}.png`;
                     document.getElementById("uv").innerHTML = data.current.uvi;
+                    // change uvi background color based on value
+                    if (data.current.uvi < 3) {
+                        document.getElementById("uv").style.backgroundColor = "green";
+
+                    }
+                    else if (data.current.uvi < 8) {
+                        document.getElementById("uv").style.backgroundColor = "gold";
+                    }
+                    else { document.getElementById("uv").style.backgroundColor = "red"; }
                 });
 
         });
 }
+//displays weather data when history is clicked 
 searchButton.addEventListener('click', function () {
     var searchinput = document.getElementById("cityinput").value;
     showWeather(searchinput);
 });
 
+// add the search to the loca histoy max 10 removing duplicates
 function addHistory(city, duplicate) {
 
     var parent = document.getElementsByClassName("historycontainer")[0];
@@ -128,7 +134,4 @@ function addHistory(city, duplicate) {
     localStorage.setItem("history", JSON.stringify(searchHistory));
 
 }
-function showForecast() {
 
-}
-// var searchinput = document.getElementById("cityinput").value;

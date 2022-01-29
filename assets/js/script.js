@@ -26,7 +26,7 @@ function showWeather(city) {
         })
         .then(function (data) {
 
-            console.log(data);
+
             if (searchHistory.includes(data.name)) {
 
 
@@ -35,7 +35,7 @@ function showWeather(city) {
             else {
                 addHistory(data.name, false);
             }
-            console.log(data.main.temp)
+
             var weather = `<br><br>Temp: ${data.main.temp}
             <br>
             <br><br>
@@ -67,6 +67,31 @@ function showWeather(city) {
                 .then(function (data) {
 
                     console.log(data);
+                    var daily = data.daily;
+                    for (var i = 0; i < 5; i++) {
+                        // forecast Date
+                        var forecastdate = new Date();
+                        var forecastday = (new Intl.DateTimeFormat('en-US', {
+                            month: 'numeric',
+                            day: '2-digit',
+                            year: 'numeric',
+                        }).format(forecastdate));
+                        var forecast = `  <h2>${forecastday}</h2>
+
+                        <img src="http://openweathermap.org/img/wn/${daily[i].weather[0].icon}.png"> <br><br>
+                        Temp: ${daily[i].temp.day}
+                        <br>
+                        <br><br>
+                        Wind: ${daily[i].wind_speed}
+                        <br>
+                        <br><br>
+                        Humidity: ${daily[i].humidity} 
+                        <br>
+                        <br><br>`;
+
+                        document.getElementsByClassName("forecastcard")[i].innerHTML = forecast;
+
+                    }
                     document.getElementById("uv").innerHTML = data.current.uvi;
                 });
 
@@ -88,7 +113,6 @@ function addHistory(city, duplicate) {
     if (duplicate) {
         var index = searchHistory.indexOf(city);
         searchHistory.splice(index, 1);
-        console.log(index)
 
         parent.removeChild(parent.children[index]);
     }

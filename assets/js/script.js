@@ -7,13 +7,18 @@ if (localStorage.getItem("history")) {
         var el = document.createElement("div");
         el.classList.add("history");
         el.innerText = searchHistory[i];
+        el.addEventListener("click", function (event) {
+
+            showWeather(event.target.innerText);
+        });
         document.getElementsByClassName("historycontainer")[0].appendChild(el);
     }
+    showWeather(searchHistory[0]);
+
 }
 
-function getApi() {
-    var searchinput = document.getElementById("cityinput").value;
-    var api = "https://api.openweathermap.org/data/2.5/weather?q=" + searchinput + "&appid=e14c3208e3e6754ae41625a043fd64c7&units=imperial";
+function showWeather(city) {
+    var api = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=e14c3208e3e6754ae41625a043fd64c7&units=imperial";
 
     fetch(api)
         .then(function (response) {
@@ -22,8 +27,14 @@ function getApi() {
         .then(function (data) {
 
             console.log(data);
-            addHistory(data.name);
+            if (searchHistory.includes(data.name)) {
 
+
+                addHistory(data.name, true);
+            }
+            else {
+                addHistory(data.name, false);
+            }
             console.log(data.main.temp)
             var weather = `<br><br>Temp: ${data.main.temp}
             <br>
@@ -61,19 +72,39 @@ function getApi() {
 
         });
 }
-searchButton.addEventListener('click', getApi);
-function addHistory(city) {
-    searchHistory.unshift(city);
-    if (searchHistory.length > 10) {
-        searchHistory.pop()
-        var parent = document.getElementsByClassName("historycontainer")[0];
+searchButton.addEventListener('click', function () {
+    var searchinput = document.getElementById("cityinput").value;
+    showWeather(searchinput);
+});
+
+function addHistory(city, duplicate) {
+
+    var parent = document.getElementsByClassName("historycontainer")[0];
+    if (searchHistory.length > 9 && duplicate == false) {
+        searchHistory.pop();
         parent.removeChild(parent.lastChild);
+
     }
+    if (duplicate) {
+        var index = searchHistory.indexOf(city);
+        searchHistory.splice(index, 1);
+        console.log(index)
+
+        parent.removeChild(parent.children[index]);
+    }
+    searchHistory.unshift(city);
     var el = document.createElement("div");
     el.classList.add("history");
     el.innerText = city;
+    el.addEventListener("click", function (event) {
+
+        showWeather(event.target.innerText);
+    });
     document.getElementsByClassName("historycontainer")[0].prepend(el);
     localStorage.setItem("history", JSON.stringify(searchHistory));
 
 }
+function showForecast() {
 
+}
+// var searchinput = document.getElementById("cityinput").value;
